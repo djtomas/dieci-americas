@@ -9,6 +9,9 @@ from datetime import datetime
 
 class ProductTemplateEvaluation(models.Model):
     _inherit = 'product.template'
+
+    serial_number_pt = fields.Char("Serial Number")
+
     calculation = fields.Boolean('Calculation')
     accessories_ids = fields.One2many('accessories.list', 'template_id', string='Accessories')
     commissions_ids = fields.One2many('commissions.list', 'template_id', string='Commissions')

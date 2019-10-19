@@ -7,15 +7,48 @@
         <field name="inherit_id" ref="product.product_template_only_form_view"/>
         <field name="arch" type="xml">
                 <field name="type" position="after" >
-                    <field name="calculation"/>
+                    <field name="calculation" groups="product_pricing_evaluation_tool.product_evaluation_user_group"/>
                 </field>
                 <field name="default_code" position="after" >
                     <field name="serial_number_pt"/>
                 </field>
             <notebook>
-                <page name="Pricing Evaluation Tool" string="Pricing Evaluation Tool" attrs="{'invisible': [('calculation', '=', False)]}">
+
+
+                <page name="Accessories"
+                      groups="product_pricing_evaluation_tool.product_evaluation_user_group"
+                      string="Accessories" attrs="{'invisible': [('calculation', '=', False)]}">
+                     <field name="accessories_ids">
+                        <tree editable="bottom" colors="red:subtotal&lt;=0;">
+                            <field name="serial_number_pt"/>
+                            <field name="product_id" required="1"/>
+                            <field name="qty" required="1"/>
+                            <field name="price" required="1"/>
+                            <field name="subtotal" widget='monetary' sum="Sum"/>
+                            <field name="note"/>
+                        </tree>
+                    </field>
+                </page>
+                <page name="Commissions" string="Commissions"
+                      groups="product_pricing_evaluation_tool.product_evaluation_user_group"
+                      attrs="{'invisible': [('calculation', '=', False)]}">
+                     <field name="commissions_ids">
+                        <tree editable="bottom">
+                            <field name="employee_id" required="1"/>
+                            <field name="porcent" required="1"/>
+                            <field name="commission" required="1" sum="Sum"/>
+                            <field name="note"/>
+                        </tree>
+                    </field>
+                </page>
+
+
+                 <page name="Pricing Evaluation Tool" string="Pricing Evaluation Tool"
+                       groups="product_pricing_evaluation_tool.product_evaluation_user_group"
+                       attrs="{'invisible': [('calculation', '=', False)]}">
                      <group>
                          <group>
+                             <field name="olist_price" required="1"/>
                              <field name="less_warranty_discount_por" required="1"/>
                              <field name="less_warranty_discount"/>
                              <field name="exchange_rate_por" required="1"/>
@@ -67,33 +100,23 @@
 
                          <group>
                              <field name="day_bank_interest"/>
+                             <field name="authorize_price" widget="boolean_toggle"/>
                          </group>
                      </group>
                 </page>
 
-                <page name="Accessories" string="Accessories" attrs="{'invisible': [('calculation', '=', False)]}">
-                     <field name="accessories_ids">
-                        <tree editable="bottom" colors="red:subtotal&lt;=0;">
-                            <field name="product_id" options="{'no_quick_create':True,'no_create_edit':True,'no_open':True}"
-                                   required="1"/>
-                            <field name="qty" required="1"/>
-                            <field name="price" required="1"/>
-                            <field name="subtotal" widget='monetary' sum="Sum"/>
-                            <field name="note"/>
-                        </tree>
-                    </field>
-                </page>
-                <page name="Commissions" string="Commissions" attrs="{'invisible': [('calculation', '=', False)]}">
-                     <field name="commissions_ids">
-                        <tree editable="bottom">
-                            <field name="employee_id" options="{'no_quick_create':True,'no_create_edit':True,'no_open':True}"
-                                   required="1"/>
-                            <field name="porcent" required="1"/>
-                            <field name="commission" required="1" sum="Sum"/>
-                            <field name="note"/>
-                        </tree>
-                    </field>
-                </page>
+
+                <page string="Attachment List"
+                      groups="product_pricing_evaluation_tool.product_evaluation_user_group">
+                                    <field name="attachment_list_ids" nolabel="1">
+                                        <tree editable="bottom">
+                                            <field name="comprobante_01_name" invisible="1"/>
+                                            <field name="comprobante_01"  filename="comprobante_01_name"/>
+                                            <field name="date" readonly="1"/>
+                                            <field name="user_id" readonly="1" sum="T"/>
+                                        </tree>
+                                    </field>
+                            </page>
 
 
             </notebook>

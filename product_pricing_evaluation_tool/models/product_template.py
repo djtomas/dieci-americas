@@ -44,6 +44,16 @@ class ProductTemplateEvaluation(models.Model):
 
     unit_price = fields.Float('Unit Price', digits=(10, 2), compute='_calcular_usd_price')
 
+    olist_price = fields.Float('Unit Price', digits=(10, 2), track_visibility='always')
+
+    authorize_price = fields.Boolean('Authorize Price', track_visibility='always')
+
+    @api.onchange('authorize_price')
+    def onchange_authorize_price(self):
+        if self.authorize_price:
+            self.list_price = self.olist_price
+
+
     @api.one
     @api.depends('standard_price', 'exchange_rate', 'less_warranty_discount')
     def _calcular_usd_price(self):
@@ -106,7 +116,7 @@ class ProductTemplateEvaluation(models.Model):
     @api.one
     @api.depends('floor_por','total_cost_delivered_t')
     def _calc_floor_rate(self):
-        self.floor_rate = self.floor_por/100 * self.list_price
+        self.floor_rate = self.floor_por/100 * self.olist_price
 
     dime_bank_interest_charges = fields.Float('Dime Bank Interest Charges', digits=(10, 2), compute='_calc_day_bank_interest')
     @api.one
@@ -155,11 +165,11 @@ class ProductTemplateEvaluation(models.Model):
     net_profit = fields.Float('Net Profit (with OH)', digits=(10, 2), compute='_calc_net_profit')
     net_profit_por = fields.Float('Net Profit (with OH) %', digits=(10, 2), compute='_calc_net_profit')
     @api.one
-    @api.depends('total_costs', 'list_price')
+    @api.depends('total_costs', 'olist_price')
     def _calc_net_profit(self):
-        self.net_profit = self.list_price - self.total_costs
-        if (self.list_price) != 0:
-            self.net_profit_por = self.net_profit / self.list_price * 100
+        self.net_profit = self.olist_price - self.total_costs
+        if (self.olist_price) != 0:
+            self.net_profit_por = self.net_profit / self.olist_price * 100
 
 
 
@@ -169,11 +179,11 @@ class ProductTemplateEvaluation(models.Model):
     gross_profit_por = fields.Float('Gross Profit without OH) %', digits=(10, 2), compute='_calc_gross_profit')
 
     @api.one
-    @api.depends('cogs', 'list_price')
+    @api.depends('cogs', 'olist_price')
     def _calc_gross_profit(self):
-        self.gross_profit = self.list_price - self.cogs
-        if (self.list_price) != 0:
-            self.gross_profit_por = self.gross_profit / self.list_price * 100
+        self.gross_profit = self.olist_price - self.cogs
+        if (self.olist_price) != 0:
+            self.gross_profit_por = self.gross_profit / self.olist_price * 100
 
 
     price_target_marg_por = fields.Float('Price at Target Margin %', digits=(10, 2), default=10)
@@ -203,6 +213,8 @@ class ProductTemplateEvaluation(models.Model):
     def _cal_day_bank_interest(self):
         self.day_bank_interest = self.days_financed * self.per_day
 
+    attachment_list_ids = fields.One2many('attachment.list', 'product_id', string='Attachment List')
+
 
 
 
@@ -226,6 +238,7 @@ class AccessoriesList(models.Model):
     price = fields.Float()
     subtotal = fields.Float('Subtotal', compute='give_subtotal')
     note = fields.Char('Note')
+    serial_number_pt = fields.Char("Serial Number", related='product_id.serial_number_pt')
 
     @api.one
     @api.depends('price','price')
@@ -241,3 +254,22 @@ class AccessoriesList(models.Model):
         self.price = self.product_id.standard_price
 
     template_id = fields.Many2one('product.template', 'producto', ondelete='cascade')
+
+
+class AttachmentList(models.Model):
+    _name = 'attachment.list'
+    _description = "Attachment List"
+
+    comprobante_01_name = fields.Char("Attachment")
+    comprobante_01 = fields.Binary(
+        string=('Attachment'),
+        copy=False,
+        help='Attachment 01')
+
+    date = fields.Datetime('Date', default=fields.Datetime.now)
+
+
+    user_id = fields.Many2one('res.users', string='User', track_visibility='onchange',
+                              default=lambda self: self.env.user)
+
+    product_id = fields.Many2one('product.template', string="Attachment", ondelete='cascade')

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record model="ir.ui.view" id="hide_tree_stock_quant">
+        <field name="name">hide_tree_stock_quant</field>
+        <field name="model">stock.quant</field>
+        <field name="inherit_id" ref="stock.view_stock_quant_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='inventory_value']" position="attributes">
+                <attribute name="groups">sale_advanced_seller.advanced_seller_group</attribute>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

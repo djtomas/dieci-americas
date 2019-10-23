@@ -1,10 +1,9 @@
-# coding: utf-8
+# -*- coding: utf-8 -*-
 ##############################################################################
 #
 #    OpenERP, Open Source Management Solution
-#    This module copyright (C) 2018 Marlon Falcón Hernandez
-#    mfalcon@ynext.cl
-#    (<http://www.ynext.cl>).
+#    This module copyright (C) 2017 Marlon Falcón Hernandez
+#    (<http://www.falconsolutions.cl>).
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -20,20 +19,36 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
-
 {
-    'name': 'Product Pricing Evaluation Tool MFH',
-    'version': '12.0.1.0.0',
+    'name': 'Ticket Pro MFH',
+    'version': '12.0.0.1.0',
     'author': 'Ynext SpA',
     'maintainer': 'Ynext SpA',
     'website': 'http://www.ynext.cl',
     'license': 'AGPL-3',
-    'category': 'Extra Tools',
-    'summary': 'Short summary.',
-    'depends': ['base','sale','hr_payroll'],
+    'category': 'Settings',
+    'summary': 'Ticket',
+    'depends': ['base','mail'],
+    'description': """
+Ticket
+=====================================================
+* Sistema de Ticket
+        """,
     'data': [
-        'views/product_template_view.xml',
+        'security/groups.xml',
+        'views/ticket_pro_view.xml',
+        'views/change_project_view.xml',
+        'views/ticket_category_view.xml',
+        'views/res_users.xml',
+        'views/assets.xml',
+        'data/ir_sequence.xml',
+        'data/ticket_pro_data.xml',
+        'data/template_response.xml',
+        'data/template_response_open.xml',
+        'data/template_close.xml',
+        'data/template_response_change.xml',
         'security/ir.model.access.csv',
     ],
-    'images': ['static/description/banner.jpg'],
+    'installable': True,
+    'auto_install': False,
 }

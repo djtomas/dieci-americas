@@ -1,14 +1,33 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import _, api, fields, models
-from odoo.exceptions import ValidationError
-from odoo.tools.safe_eval import safe_eval
+# -*- coding: utf-8 -*-
+import time
+import xlwt
+import base64
+import re
+import io
+import calendar
+from io import StringIO
 from datetime import datetime
+from odoo import models, fields, api, _
+from odoo.exceptions import ValidationError
+from odoo.exceptions import UserError
 
 
 class ProductTemplateEvaluation(models.Model):
     _inherit = 'product.template'
+
+    state_pe = fields.Selection([('new', 'New'),
+                              ('factory', 'Factory'),
+                              ('bought', 'Bought'),
+                              ('sold', 'Sold'),
+                              ('installed', 'Installed')], 'State PE', required=True,
+                             track_visibility='onchange',
+                                default='new')
+
+    factory_paid = fields.Selection([('Y', 'Y'),
+                                     ('N', 'N')], 'Factory Paid', track_visibility='onchange', default='N')
 
     serial_number_pt = fields.Char("Serial Number")
 
@@ -214,6 +233,128 @@ class ProductTemplateEvaluation(models.Model):
         self.day_bank_interest = self.days_financed * self.per_day
 
     attachment_list_ids = fields.One2many('attachment.list', 'product_id', string='Attachment List')
+
+    @api.multi
+    def button_print_xls(self):
+        self.ensure_one
+        today = datetime.today().strftime("%d-%m-%Y")
+        workbook = xlwt.Workbook(encoding="utf-8")
+
+    def print_excel(self):
+        record_ids = self._context.get('active_ids')
+
+        if not record_ids:
+            raise UserError('There are no selected products.')
+        """
+        abstract_model = self.env['report.l10n_cl_base.report_8column_balance']
+        asset_type_ids = fr_obj.browse(self.asset_fr_id.id).account_type_ids.ids
+        liability_type_ids = fr_obj.browse(self.liability_fr_id.id).account_type_ids.ids
+        income_type_ids = fr_obj.browse(self.income_fr_id.id).account_type_ids.ids
+        expense_type_ids = fr_obj.browse(self.expense_fr_id.id).account_type_ids.ids
+        types = asset_type_ids + liability_type_ids + income_type_ids + expense_type_ids
+        accounts = self.env['account.account'].search([('user_type_id', 'in', types)])
+        account_res = abstract_model._get_accounts(accounts, self.read([])[0])
+        summatory = abstract_model._get_summatory(account_res)
+        difference = abstract_model._get_difference(summatory)
+        totals = abstract_model._get_totals(summatory, difference)
+        """
+        workbook = xlwt.Workbook(encoding="utf-8")
+        header_style2 = xlwt.easyxf(
+            'pattern: pattern solid, pattern_fore_colour pale_blue, pattern_back_colour gray25; font: bold on, height 160; align: wrap on, horiz center, vert center;')
+        date_style = xlwt.easyxf(
+            'align: wrap yes; align: wrap on, horiz center, vert center;',
+            num_format_str='DD-MM-YYYY')
+        datetime_style = xlwt.easyxf('font: height 140; align: wrap yes', num_format_str='YYYY-MM-DD HH:mm:SS')
+        today = datetime.today().strftime("%d-%m-%Y")
+        worksheet = workbook.add_sheet('Product Report')
+        col = 0
+        worksheet.write_merge(0, 1, 0, 0, 'Item', header_style2)
+        worksheet.write_merge(0, 1, 1, 1, 'Description', header_style2)
+        worksheet.write_merge(0, 1, 2, 2, 'Purchase Date', header_style2)
+        worksheet.write_merge(0, 1, 3, 3, 'Location of Fixed Asset', header_style2)
+        worksheet.write_merge(0, 1, 4, 4, 'Euro Value', header_style2)
+        worksheet.write_merge(0, 1, 5, 5, 'Conversion Rate', header_style2)
+        worksheet.write_merge(0, 1, 6, 6, 'Cost USD', header_style2)
+        worksheet.write_merge(0, 1, 7, 7, 'Freight', header_style2)
+        worksheet.write_merge(0, 1, 8, 8, 'Total Fob', header_style2)
+        worksheet.write_merge(0, 1, 9, 9, 'Factory Paid', header_style2)
+        worksheet.write_merge(0, 1, 10, 10, 'Attachments', header_style2)
+        worksheet.write_merge(0, 1, 11, 11, 'Additional transports Cost', header_style2)
+        worksheet.write_merge(0, 1, 12, 12, 'Warranty', header_style2)
+        worksheet.write_merge(0, 1, 13, 13, 'Prep Labor', header_style2)
+        worksheet.write_merge(0, 1, 14, 14, 'Other cost', header_style2)
+        worksheet.write_merge(0, 1, 15, 15, 'Commission', header_style2)
+        worksheet.write_merge(0, 1, 16, 16, 'Financial Floor Plan', header_style2)
+        worksheet.write_merge(0, 1, 17, 17, 'Dime Bank', header_style2)
+        worksheet.write_merge(0, 1, 18, 18, 'Subtotal', header_style2)
+        worksheet.write_merge(0, 1, 19, 19, 'OH Factor', header_style2)
+        worksheet.write_merge(0, 1, 20, 20, 'Total Cost', header_style2)
+        worksheet.write_merge(0, 1, 21, 21, 'Invoice Amount w/Shipping', header_style2)
+        worksheet.write_merge(0, 1, 22, 22, 'Sold to', header_style2)
+        worksheet.write_merge(0, 1, 23, 23, 'Date Sold', header_style2)
+        worksheet.write_merge(0, 1, 24, 24, 'Rcvd Pymnt', header_style2)
+        worksheet.write_merge(0, 1, 25, 25, 'Gross Profit w/o Overhead', header_style2)
+        worksheet.write_merge(0, 1, 26, 26, 'Net Profit', header_style2)
+        row_index = 2
+        col = 0
+        myrow = 0
+        for product in self.env['product.template'].browse(record_ids):
+            if product.calculation:
+                j = 0
+                worksheet.write(row_index, j, str(product.default_code), ); j += 1
+                worksheet.write(row_index, j, str(product.name), ); j += 1
+                worksheet.write(row_index, j, product.purchase_date, date_style); j += 1
+                worksheet.write(row_index, j, 0, ); j += 1
+                worksheet.write(row_index, j, product.standard_price, ); j += 1
+                worksheet.write(row_index, j, product.exchange_rate_por, ); j += 1
+                worksheet.write(row_index, j, product.unit_price, ); j += 1
+                worksheet.write(row_index, j, product.freight_in_us, ); j += 1
+                worksheet.write(row_index, j, product.total_fob, ); j += 1
+                worksheet.write(row_index, j, product.factory_paid, ); j += 1
+                worksheet.write(row_index, j, 0, );j += 1
+                worksheet.write(row_index, j, product.total_cost_delivered, ); j += 1
+                worksheet.write(row_index, j, product.warranty, ); j += 1
+                worksheet.write(row_index, j, 0, ); j += 1
+                worksheet.write(row_index, j, 0, ); j += 1
+                worksheet.write(row_index, j, product.total_commission, ); j += 1
+                worksheet.write(row_index, j, product.floor_rate, );j += 1
+                worksheet.write(row_index, j, product.dime_bank_interest_charges, );j += 1
+                worksheet.write(row_index, j, product.sub_total, );j += 1
+                worksheet.write(row_index, j, 0, ); j += 1
+                worksheet.write(row_index, j, 0, ); j += 1
+                worksheet.write(row_index, j, 0, ); j += 1
+                worksheet.write(row_index, j, product.sold_id.name, ); j += 1
+                worksheet.write(row_index, j, product.date_sold, date_style); j += 1
+                worksheet.write(row_index, j, product.rcvd_pymnt, date_style); j += 1
+                worksheet.write(row_index, j, 0, ); j += 1
+                worksheet.write(row_index, j, product.net_profit,);j += 1
+                row_index += 1
+
+        fp = io.BytesIO()
+        workbook.save(fp)
+        fp.seek(0)
+        data = fp.read()
+        fp.close()
+        data_b64 = base64.encodestring(data)
+        attach = self.env['ir.attachment'].create({
+            'name': '%s %s.xls' % ('Product_Report_1000', today),
+            'type': 'binary',
+            'datas': data_b64,
+            'datas_fname': '%s %s.xls' % ('Product_Report_1000', today),
+        })
+        return {
+            'type': "ir.actions.act_url",
+            'url': "web/content/?model=ir.attachment&id=" + str(
+                attach.id) + "&filename_field=datas_fname&field=datas&download=true&filename=" + str(attach.name),
+            'target': "self",
+            'no_destroy': False,
+        }
+
+    purchase_date = fields.Date('Purchase Date')
+    date_sold = fields.Date('Date Sold')
+    rcvd_pymnt = fields.Date('Rcvd Pymnt')
+    sold_id = fields.Many2one('res.users', string='Sold to')
+
 
 
 

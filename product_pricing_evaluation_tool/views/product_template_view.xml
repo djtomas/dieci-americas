@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
+    <!-- Share Button in action menu -->
+    <record id="product_evaluation_1000_xls_server_action" model="ir.actions.server">
+        <field name="name">[ XLS Product Report 10000 ]</field>
+        <field name="model_id" ref="sale.model_product_template"/>
+        <field name="binding_model_id" ref="sale.model_product_template"/>
+        <field name="state">code</field>
+        <field name="code">action = records.print_excel()</field>
+    </record>
+
 
     <record model="ir.ui.view" id="inh_product_template_evaluation_form_view">
         <field name="name">product.template.evaluation.form.inherited</field>
@@ -11,6 +20,8 @@
                 </field>
                 <field name="default_code" position="after" >
                     <field name="serial_number_pt"/>
+                    <field name="state_pe"/>
+                    <field name="factory_paid"/>
                 </field>
             <notebook>
 
@@ -118,6 +129,21 @@
                                     </field>
                             </page>
 
+                <page name="Data" string="Other     Data"
+                      groups="sale_advanced_seller.advanced_seller_group"
+                      attrs="{'invisible': [('calculation', '=', False)]}">
+                    <group>
+                        <group>
+                            <field name="purchase_date"/>
+                            <field name="date_sold"/>
+                        </group>
+                        <group>
+                            <field name="rcvd_pymnt"/>
+                            <field name="sold_id"/>
+                        </group>
+                    </group>
+                </page>
+
 
             </notebook>
         </field>
@@ -131,6 +157,12 @@
         <field name="arch" type="xml">
             <field name="name" position="after">
                 <field name="serial_number_pt"/>
+                <field name="calculation"/>
+                <field name="state_pe"/>
+                <field name="purchase_date"/>
+                <field name="date_sold"/>
+                <field name="rcvd_pymnt"/>
+                <field name="sold_id"/>
             </field>
        </field>
     </record>

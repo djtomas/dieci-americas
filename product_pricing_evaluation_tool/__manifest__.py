@@ -28,9 +28,9 @@
     'maintainer': 'Ynext SpA',
     'website': 'http://www.ynext.cl',
     'license': 'AGPL-3',
-    'category': 'Extra Tools',
-    'summary': 'Short summary.',
-    'depends': ['base','sale','hr_payroll'],
+    'category': 'It allows to calculate product margins',
+    'summary': 'Product Evaluation.',
+    'depends': ['base','stock','hr_payroll','sale_advanced_seller'],
     'data': [
         'views/product_template_view.xml',
         'security/ir.model.access.csv',

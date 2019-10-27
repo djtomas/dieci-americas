@@ -33,7 +33,6 @@
         'base',
         'product',
         'stock',
-        'sale_advanced_seller',
     ],
     'description': """
 Vendedor Avanzado

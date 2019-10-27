@@ -156,7 +156,6 @@
         <field name="inherit_id" ref="product.product_template_tree_view"/>
         <field name="arch" type="xml">
             <field name="name" position="after">
-                <field name="serial_number_pt"/>
                 <field name="calculation"/>
                 <field name="state_pe"/>
                 <field name="purchase_date"/>

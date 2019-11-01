@@ -231,7 +231,7 @@ class ProductTemplateEvaluation(models.Model):
     def _cal_day_bank_interest(self):
         self.day_bank_interest = self.days_financed * self.per_day
 
-    attachment_list_ids = fields.One2many('attachment.list', 'product_id', string='Attachment List')
+    attachment_list_ids = fields.Many2many('ir.attachment', string='Attachment List')
 
     @api.multi
     def button_print_xls(self):

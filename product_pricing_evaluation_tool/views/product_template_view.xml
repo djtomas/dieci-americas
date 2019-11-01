@@ -119,14 +119,14 @@
 
                 <page string="Attachment List"
                       groups="sale_advanced_seller.advanced_seller_group">
-                                    <field name="attachment_list_ids" nolabel="1">
-                                        <tree editable="bottom">
-                                            <field name="data_filename" invisible="1"/>
+                                    <field name="attachment_list_ids"  widget="many2many_binary"  nolabel="1"/>
+                                       <!-- <tree editable="bottom">
+                                            <field name="data_filename" invisible="0"/>
                                             <field name="data" filename="data_filename"/>
                                             <field name="date" readonly="1"/>
                                             <field name="user_id" readonly="1" sum="T"/>
-                                        </tree>
-                                    </field>
+                                      </tree>
+                                    </field> -->
                             </page>
 
                 <page name="Data" string="Other     Data"

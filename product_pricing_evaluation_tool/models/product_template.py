@@ -17,7 +17,6 @@ from odoo.exceptions import UserError
 
 class ProductTemplateEvaluation(models.Model):
     _inherit = 'product.template'
-
     state_pe = fields.Selection([('new', 'New'),
                               ('factory', 'Factory'),
                               ('bought', 'Bought'),
@@ -350,10 +349,10 @@ class ProductTemplateEvaluation(models.Model):
             'no_destroy': False,
         }
 
-    purchase_date = fields.Date('Purchase Date')
-    date_sold = fields.Date('Date Sold')
-    rcvd_pymnt = fields.Date('Rcvd Pymnt')
-    sold_id = fields.Many2one('res.users', string='Sold to')
+    purchase_date = fields.Date('Purchase Date', track_visibility='onchange')
+    date_sold = fields.Date('Date Sold', track_visibility='onchange')
+    rcvd_pymnt = fields.Date('Rcvd Pymnt', track_visibility='onchange')
+    sold_id = fields.Many2one('res.users', string='Sold to', track_visibility='onchange')
 
 
 
@@ -401,11 +400,11 @@ class AttachmentList(models.Model):
     _name = 'attachment.list'
     _description = "Attachment List"
 
-    comprobante_01_name = fields.Char("Attachment")
-    comprobante_01 = fields.Binary(
-        string=('Attachment'),
-        copy=False,
-        help='Attachment 01')
+
+    data = fields.Binary(string="Attachment", help='Attachment 01')
+    data_filename = fields.Char("Attachment")
+
+
 
     date = fields.Datetime('Date', default=fields.Datetime.now)
 

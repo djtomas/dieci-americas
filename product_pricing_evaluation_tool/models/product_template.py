@@ -51,7 +51,7 @@ class ProductTemplateEvaluation(models.Model):
     exchange_rate = fields.Float('Exchange Rate', digits=(10, 2), compute='_calcular_exchange_rate')
 
     @api.one
-    @api.depends('exchange_rate_por', 'standard_price','exchange_rate')
+    @api.depends('exchange_rate_por', 'standard_price')
     def _calcular_exchange_rate(self):
         # self.exchange_rate = ((self.standard_price + self.less_warranty_discount)*self.exchange_rate_por)-self.standard_price
         suma = self.standard_price - self.less_warranty_discount
@@ -220,7 +220,7 @@ class ProductTemplateEvaluation(models.Model):
     per_day = fields.Float('per Day', digits=(10, 2), compute='_calc_per_day')
 
     @api.one
-    @api.depends('unit_price', 'per_day')
+    @api.depends('unit_price')
     def _calc_per_day(self):
         self.per_day = (self.unit_price * self.interest_rate/100)/360
 

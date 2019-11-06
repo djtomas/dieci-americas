@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Share Button in action menu 
+    <record id="product_evaluation_1000_xls_server_action" model="ir.actions.server">
+        <field name="name">[ XLS Product Report 10000 ]</field>
+        <field name="model_id" ref="sale.model_product_template"/>
+        <field name="binding_model_id" ref="sale.model_product_template"/>
+        <field name="state">code</field>
+        <field name="code">action = records.print_excel()</field>
+    </record>
+    -->
+
+
+    <record model="ir.ui.view" id="inh_stock_production_lot_evaluation_form_view">
+        <field name="name">stock.production.lot.evaluation.form.inherited</field>
+        <field name="model">stock.production.lot</field>
+        <field name="inherit_id" ref="stock.view_production_lot_form"/>
+        <field name="arch" type="xml">
+                <field name="product_id" position="after" >
+                	<field name="standard_price"/>
+                	<field name="factory_paid"/>
+                    <field name="calculation" groups="sale_advanced_seller.advanced_seller_group"/>
+                    <field name="state_pe"/>
+                    <field name="factory_paid"/>
+
+
+             
+
+                </field>
+
+				<xpath expr="//div[hasclass('oe_title')]" position="after">
+	                 <notebook>
+			                <page name="Principal" string="Principal">
+			                 </page>
+
+
+			                 <page name="Accessories"
+                      groups="sale_advanced_seller.advanced_seller_group"
+                      string="Accessories" attrs="{'invisible': [('calculation', '=', False)]}">
+                     <field name="accessories_ids">
+                        <tree editable="bottom" colors="red:subtotal&lt;=0;">
+                            <field name="serial_number_pt"/>
+                            <field name="product_id" required="1"/>
+                            <field name="qty" required="1"/>
+                            <field name="price" required="1"/>
+                            <field name="subtotal" widget='monetary' sum="Sum"/>
+                            <field name="note"/>
+                        </tree>
+                    </field>
+                </page>
+                <page name="Commissions" string="Commissions"
+                      groups="sale_advanced_seller.advanced_seller_group"
+                      attrs="{'invisible': [('calculation', '=', False)]}">
+                     <field name="commissions_ids">
+                        <tree editable="bottom">
+                            <field name="employee_id" required="1"/>
+                            <field name="porcent" required="1"/>
+                            <field name="commission" required="1" sum="Sum"/>
+                            <field name="note"/>
+                        </tree>
+                    </field>
+                </page>
+
+
+                 <page name="Pricing Evaluation Tool" string="Pricing Evaluation Tool"
+                       groups="sale_advanced_seller.advanced_seller_group"
+                       attrs="{'invisible': [('calculation', '=', False)]}">
+                     <group>
+                         <group>
+                             <field name="olist_price" required="1"/>
+                             <field name="less_warranty_discount_por" required="1"/>
+                             <field name="less_warranty_discount"/>
+                             <field name="exchange_rate_por" required="1"/>
+                             <field name="exchange_rate"/>
+                             <field name="unit_price" string="Unit Price USD"/>
+                             <field name="freight_in_us" required="1"/>
+                             <field name="total_fob"/>
+                             <field name="total_cost_delivered"/>
+                             <field name="total_cost_delivered_t"/>
+                             <field name="freight_to_customer" required="1"/>
+                             <field name="warranty" required="1"/>
+                         </group>
+                         <group>
+                             <field name="bk" required="1"/>
+                             <field name="total_commission"/>
+                             <field name="floor_por" required="1"/>
+                             <field name="floor_rate"/>
+                             <field name="dime_bank_interest_charges"/>
+                             <field name="sub_total"/>
+                             <field name="risk_factor" required="1"/>
+                             <field name="risk_factor_value"/>
+                             <field name="cogs"/>
+                             <field name="over_factor"/>
+                             <field name="over_factor_total"/>
+                             <field name="total_costs"/>
+                         </group>
+                     </group>
+
+                    <group>
+                         <group>
+                             <field name="net_profit"/>
+                             <field name="net_profit_por"/>
+                             <field name="gross_profit"/>
+                             <field name="gross_profit_por"/>
+                         </group>
+                         <group>
+                             <field name="price_target_marg_por" required="1"/>
+                             <field name="price_target_marg"/>
+                         </group>
+                     </group>
+
+
+                    <group>
+                         <group>
+                             <field name="days_financed" required="1"/>
+                             <field name="interest_rate" required="1"/>
+                             <field name="per_day"/>
+                         </group>
+
+                         <group>
+                             <field name="day_bank_interest"/>
+                             <field name="authorize_price" widget="boolean_toggle"/>
+                         </group>
+                     </group>
+                </page>
+
+
+                <page string="Attachment List"
+                      groups="sale_advanced_seller.advanced_seller_group">
+                                    <field name="attachment_list_ids"  widget="many2many_binary"  nolabel="1"/>
+                </page>
+
+                <page name="Data" string="Other     Data"
+                      groups="sale_advanced_seller.advanced_seller_group"
+                      attrs="{'invisible': [('calculation', '=', False)]}">
+                    <group>
+                        <group>
+                            <field name="date_sold"/>
+                            <field name="sold_id"/>
+                        </group>
+                        <group>
+                            <field name="rcvd_pymnt"/>
+                            <field name="purchase_date"/>
+                        </group>
+                    </group>
+                </page>
+	              </notebook>
+              	</xpath>
+            
+        </field>
+    </record>
+
+    <record id="inh_stock_production_lot_eval_tree" model="ir.ui.view">
+        <field name="name">inh.stock.production.lot.eval</field>
+        <field name="model">stock.production.lot</field>
+        <field name="priority" eval="30"/>
+        <field name="inherit_id" ref="stock.view_production_lot_tree"/>
+        <field name="arch" type="xml">
+            <field name="name" position="after">
+                <field name="calculation"/>
+                <field name="state_pe"/>
+                <field name="purchase_date"/>
+                <field name="date_sold"/>
+                <field name="rcvd_pymnt"/>
+                <field name="sold_id"/>
+            </field>
+       </field>
+    </record>
+
+
+
+</odoo>

@@ -125,7 +125,7 @@ class ProductTemplateEvaluation(models.Model):
     freight_to_customer = fields.Float('Freight to Customer', digits=(10, 2))
 
     warranty = fields.Float('Warranty', digits=(10, 2))
-    bk = fields.Float('B&K/Labor', digits=(10, 2))
+    bk = fields.Float('Pre Delivery', digits=(10, 2))
 
 
 

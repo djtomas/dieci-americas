@@ -72,13 +72,10 @@ class StockProductionLotEvaluation(models.Model):
     def onchange_authorize_price(self):
         if self.authorize_price:
             print(self.olist_price)
-            print(self.product_id.product_tmpl_id)
-            print(self.product_id.product_tmpl_id.lst_price)
-            self.product_id.product_tmpl_id.lst_price = 1
-            print(self.product_id.product_tmpl_id.lst_price)
-            self.product_id.product_tmpl_id.list_price = self.olist_price
-            self.product_id.product_tmpl_id.lst_price = self.olist_price
 
+            record_ids = self.env['product.template'].search([('id', '=', self.product_id.id)])
+            for record in record_ids:
+                record.write({'list_price': self.olist_price,})
 
     @api.one
     @api.depends('standard_price', 'exchange_rate', 'less_warranty_discount')

@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <!-- Share Button in action menu 
     <record id="product_evaluation_1000_xls_server_action" model="ir.actions.server">
         <field name="name">[ XLS Product Report 10000 ]</field>
-        <field name="model_id" ref="sale.model_product_template"/>
-        <field name="binding_model_id" ref="sale.model_product_template"/>
+        <field name="model_id" ref="stock.model_stock_production_lot"/>
+        <field name="binding_model_id" ref="stock.model_stock_production_lot"/>
         <field name="state">code</field>
         <field name="code">action = records.print_excel()</field>
     </record>
-    -->
 
 
     <record model="ir.ui.view" id="inh_stock_production_lot_evaluation_form_view">

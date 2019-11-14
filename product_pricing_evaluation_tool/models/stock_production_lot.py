@@ -302,14 +302,15 @@ class StockProductionLotEvaluation(models.Model):
         row_index = 2
         col = 0
         myrow = 0
-        for product in self.env['product.template'].browse(record_ids):
+
+        for product in self.env['stock.production.lot'].browse(record_ids):
             if product.calculation:
                 j = 0
-                worksheet.write(row_index, j, str(product.default_code), ); j += 1
-                worksheet.write(row_index, j, str(product.name), ); j += 1
+                worksheet.write(row_index, j, str(product.product_id.default_code), ); j += 1
+                worksheet.write(row_index, j, str(product.product_id.name), ); j += 1
                 worksheet.write(row_index, j, product.purchase_date, date_style); j += 1
                 worksheet.write(row_index, j, 0, ); j += 1
-                worksheet.write(row_index, j, product.standard_price, ); j += 1
+                worksheet.write(row_index, j, product.product_id.standard_price, ); j += 1
                 worksheet.write(row_index, j, product.exchange_rate_por, ); j += 1
                 worksheet.write(row_index, j, product.unit_price, ); j += 1
                 worksheet.write(row_index, j, product.freight_in_us, ); j += 1
@@ -333,6 +334,7 @@ class StockProductionLotEvaluation(models.Model):
                 worksheet.write(row_index, j, 0, ); j += 1
                 worksheet.write(row_index, j, product.net_profit,);j += 1
                 row_index += 1
+
 
         fp = io.BytesIO()
         workbook.save(fp)

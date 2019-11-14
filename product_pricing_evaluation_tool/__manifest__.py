@@ -30,7 +30,7 @@
     'license': 'AGPL-3',
     'category': 'It allows to calculate product margins',
     'summary': 'Product Evaluation.',
-    'depends': ['hr_payroll','sale','purchase','sale_advanced_seller','stock'],
+    'depends': ['hr_payroll','sale','purchase','sale_advanced_seller','stock','product_expiry'],
     'data': [
         'views/stock_production_lot.xml',
         'security/ir.model.access.csv',

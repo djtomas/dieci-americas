@@ -33,6 +33,8 @@
     'depends': ['hr_payroll','sale','purchase','sale_advanced_seller','stock','product_expiry'],
     'data': [
         'views/stock_production_lot.xml',
+        'views/purchase_order_view.xml',
+        'views/account_invoice_view.xml',
         'security/ir.model.access.csv',
     ],
     'images': ['static/description/banner.jpg'],

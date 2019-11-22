@@ -16,15 +16,10 @@
         <field name="inherit_id" ref="stock.view_production_lot_form"/>
         <field name="arch" type="xml">
                 <field name="product_id" position="after" >
-                	<field name="standard_price"/>
                 	<field name="factory_paid"/>
                     <field name="calculation" groups="sale_advanced_seller.advanced_seller_group"/>
                     <field name="state_pe"/>
                     <field name="factory_paid"/>
-
-
-             
-
                 </field>
 
 				<xpath expr="//div[hasclass('oe_title')]" position="after">
@@ -67,6 +62,7 @@
                      <group>
                          <group>
                              <field name="olist_price" required="1"/>
+                             <field name="standard_price" required="1"/>
                              <field name="less_warranty_discount_por" required="1"/>
                              <field name="less_warranty_discount"/>
                              <field name="exchange_rate_por" required="1"/>

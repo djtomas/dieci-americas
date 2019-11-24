@@ -306,7 +306,7 @@ class StockProductionLotEvaluation(models.Model):
         for product in self.env['stock.production.lot'].browse(record_ids):
             if product.calculation:
                 j = 0
-                worksheet.write(row_index, j, str(product.product_id.default_code), ); j += 1
+                worksheet.write(row_index, j, str(product.name), ); j += 1
                 worksheet.write(row_index, j, str(product.product_id.name), ); j += 1
                 worksheet.write(row_index, j, product.purchase_date, date_style); j += 1
                 worksheet.write(row_index, j, 0, ); j += 1

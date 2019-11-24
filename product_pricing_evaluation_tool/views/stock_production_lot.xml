@@ -61,8 +61,8 @@
                        attrs="{'invisible': [('calculation', '=', False)]}">
                      <group>
                          <group>
-                             <field name="olist_price" required="1"/>
-                             <field name="standard_price" required="1"/>
+                             <field name="olist_price" string="Price to Customer" required="1"/>
+                             <field name="standard_price" string="Unit Cost"  required="1"/>
                              <field name="less_warranty_discount_por" required="1"/>
                              <field name="less_warranty_discount"/>
                              <field name="exchange_rate_por" required="1"/>

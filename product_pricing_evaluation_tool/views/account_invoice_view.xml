@@ -8,6 +8,13 @@
             <field name="date_invoice" position="before">
                 <field name="invoice_number_eva" string="Invoice Number"/>
             </field>
+
+            <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='name']" position="after">
+                <field name="stock_production_lot_id"
+                       string="Serial"
+                       groups="sale_advanced_seller.advanced_seller_group"/>
+            </xpath>
+
         </field>
     </record>
 
@@ -44,6 +51,13 @@
             <field name="date_invoice" position="before">
                <field name="invoice_number_eva"/>
             </field>
+
+            <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='name']" position="after">
+                <field name="stock_production_lot_id"
+                       string="Serial"
+                       groups="sale_advanced_seller.advanced_seller_group"/>
+            </xpath>
+
         </field>
     </record>
 </odoo>

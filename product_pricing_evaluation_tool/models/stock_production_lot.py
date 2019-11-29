@@ -102,6 +102,7 @@ class StockProductionLotEvaluation(models.Model):
 
 
     total_fob = fields.Float('Total Fob', digits=(10, 2), compute='_calcular_fob')
+
     @api.one
     @api.depends('freight_in_us', 'unit_price')
     def _calcular_fob(self):
@@ -110,7 +111,7 @@ class StockProductionLotEvaluation(models.Model):
 
     total_cost_delivered = fields.Float('Total Unit Cost as Delivered Sum', digits=(10, 2), compute='_calc_total_cost_delivered')
     @api.one
-    @api.depends('accessories_ids')
+    @api.depends('accessories_ids','total_fob')
     def _calc_total_cost_delivered(self):
         tacc = 0
         if self.accessories_ids:
@@ -197,7 +198,7 @@ class StockProductionLotEvaluation(models.Model):
     total_costs = fields.Float('Total Costs', digits=(10, 2), compute='_calc_total_costs')
 
     @api.one
-    @api.depends('cogs', 'over_factor_total')
+    @api.depends('cogs', 'over_factor_total','freight_in_us')
     def _calc_total_costs(self):
         self.total_costs = self.cogs + self.over_factor_total
 
@@ -229,7 +230,7 @@ class StockProductionLotEvaluation(models.Model):
     price_target_marg = fields.Float('Price at Target Margin', digits=(10, 2), default=10, compute='_calc_price_target_marg')
 
     @api.one
-    @api.depends('total_costs', 'price_target_marg_por')
+    @api.depends('total_costs', 'price_target_marg_por','freight_in_us')
     def _calc_price_target_marg(self):
         if (self.price_target_marg_por) != 0:
             self.price_target_marg = self.total_costs / (1-self.price_target_marg_por/100)
@@ -241,7 +242,7 @@ class StockProductionLotEvaluation(models.Model):
     per_day = fields.Float('per Day', digits=(10, 2), compute='_calc_per_day')
 
     @api.one
-    @api.depends('unit_price')
+    @api.depends('unit_price','interest_rate','days_financed')
     def _calc_per_day(self):
         self.per_day = (self.unit_price * self.interest_rate/100)/360
 

@@ -33,6 +33,18 @@ class AccountInvoice(models.Model):
                             line.stock_production_lot_id.sold_id = line.invoice_id.user_id.id
         return res
 
+    @api.multi
+    def action_invoice_paid(self):
+        res = super(AccountInvoice, self).action_invoice_paid()
+        mydate = date.today()
+
+        for line in self.invoice_line_ids:
+            if line.product_id:
+                if line.stock_production_lot_id:
+                    if self.type == 'out_invoice':
+                        line.stock_production_lot_id.rcvd_pymnt = mydate
+        return res
+
 
 class AccountInvoiceLineSerial(models.Model):
     _inherit = 'account.invoice.line'

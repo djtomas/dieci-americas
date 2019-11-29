@@ -29,7 +29,23 @@ class StockProductionLotEvaluation(models.Model):
                                 default='new')
 
     factory_paid = fields.Selection([('Y', 'Y'),
-                                     ('N', 'N')], 'Factory Paid', track_visibility='onchange', default='N')
+                                     ('N', 'N')], 'Factory Paid', default='N',
+    compute = '_calcular_factory_paid')
+
+    @api.one
+    def _calcular_factory_paid(self):
+        id_product = self.product_id.id
+        obj_invoice = self.env['account.invoice.line'].search([('product_id', '=', id_product)])
+        if obj_invoice:
+            for id in obj_invoice:
+                if id.invoice_id.state == 'paid':
+                    self.factory_paid = 'Y'
+                else:
+                    self.factory_paid = 'N'
+        else:
+            self.factory_paid = 'N'
+
+
 
     serial_number_pt = fields.Char("Serial Number")
 
@@ -265,9 +281,7 @@ class StockProductionLotEvaluation(models.Model):
         workbook = xlwt.Workbook(encoding="utf-8")
         header_style2 = xlwt.easyxf(
             'pattern: pattern solid, pattern_fore_colour pale_blue, pattern_back_colour gray25; font: bold on, height 160; align: wrap on, horiz center, vert center;')
-        date_style = xlwt.easyxf(
-            'align: wrap yes; align: wrap on, horiz center, vert center;',
-            num_format_str='DD-MM-YYYY')
+        date_style = xlwt.easyxf(num_format_str='D/M/YY')
         datetime_style = xlwt.easyxf('font: height 140; align: wrap yes', num_format_str='YYYY-MM-DD HH:mm:SS')
         today = datetime.today().strftime("%d-%m-%Y")
         worksheet = workbook.add_sheet('Product Report')
@@ -303,35 +317,52 @@ class StockProductionLotEvaluation(models.Model):
         col = 0
         myrow = 0
 
+
+        cont = 2
         for product in self.env['stock.production.lot'].browse(record_ids):
+            cont += 1
             if product.calculation:
+                """ Buscamos la Ubicación """
+                locattion = "-"
+                obj_stock_move_line = self.env['stock.move.line'].search([('lot_id', '=', product.id)], limit=1)
+                for id in obj_stock_move_line:
+                    if id.location_dest_id.name:
+                        locattion = id.location_dest_id.name
+
                 j = 0
                 worksheet.write(row_index, j, str(product.name), ); j += 1
                 worksheet.write(row_index, j, str(product.product_id.name), ); j += 1
                 worksheet.write(row_index, j, product.purchase_date, date_style); j += 1
-                worksheet.write(row_index, j, 0, ); j += 1
+                worksheet.write(row_index, j, locattion, ); j += 1
                 worksheet.write(row_index, j, product.product_id.standard_price, ); j += 1
                 worksheet.write(row_index, j, product.exchange_rate_por, ); j += 1
                 worksheet.write(row_index, j, product.unit_price, ); j += 1
                 worksheet.write(row_index, j, product.freight_in_us, ); j += 1
                 worksheet.write(row_index, j, product.total_fob, ); j += 1
                 worksheet.write(row_index, j, product.factory_paid, ); j += 1
+
                 worksheet.write(row_index, j, 0, );j += 1
                 worksheet.write(row_index, j, product.total_cost_delivered, ); j += 1
                 worksheet.write(row_index, j, product.warranty, ); j += 1
-                worksheet.write(row_index, j, 0, ); j += 1
+                worksheet.write(row_index, j, product.bk, ); j += 1
                 worksheet.write(row_index, j, 0, ); j += 1
                 worksheet.write(row_index, j, product.total_commission, ); j += 1
                 worksheet.write(row_index, j, product.floor_rate, );j += 1
                 worksheet.write(row_index, j, product.dime_bank_interest_charges, );j += 1
-                worksheet.write(row_index, j, product.sub_total, );j += 1
-                worksheet.write(row_index, j, 0, ); j += 1
-                worksheet.write(row_index, j, 0, ); j += 1
+
+                subtotal_form = product.total_cost_delivered + product.warranty + product.bk + product.total_commission + product.floor_rate + product.dime_bank_interest_charges
+
+                worksheet.write(row_index, j, subtotal_form, );j += 1
+                worksheet.write(row_index, j, product.over_factor_total, ); j += 1
+
+                total_cost = product.over_factor_total + product.sub_total
+
+                worksheet.write(row_index, j, total_cost, ); j += 1
                 worksheet.write(row_index, j, 0, ); j += 1
                 worksheet.write(row_index, j, product.sold_id.name, ); j += 1
                 worksheet.write(row_index, j, product.date_sold, date_style); j += 1
                 worksheet.write(row_index, j, product.rcvd_pymnt, date_style); j += 1
-                worksheet.write(row_index, j, 0, ); j += 1
+                worksheet.write(row_index, j, product.gross_profit, ); j += 1
                 worksheet.write(row_index, j, product.net_profit,);j += 1
                 row_index += 1
 

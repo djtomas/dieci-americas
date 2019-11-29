@@ -19,7 +19,6 @@
                 	<field name="factory_paid"/>
                     <field name="calculation" groups="sale_advanced_seller.advanced_seller_group"/>
                     <field name="state_pe"/>
-                    <field name="factory_paid"/>
                 </field>
 
 				<xpath expr="//div[hasclass('oe_title')]" position="after">
@@ -85,7 +84,7 @@
                              <field name="risk_factor" required="1"/>
                              <field name="risk_factor_value"/>
                              <field name="cogs"/>
-                             <field name="over_factor"/>
+                             <field name="over_factor" required="1"/>
                              <field name="over_factor_total"/>
                              <field name="total_costs"/>
                          </group>
